@@ -1,0 +1,291 @@
+/* Stripe Packages Display */
+.slimwp-stripe-packages {
+    display: grid;
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.slimwp-stripe-packages[data-columns="1"] {
+    grid-template-columns: 1fr;
+}
+
+.slimwp-stripe-packages[data-columns="2"] {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.slimwp-stripe-packages[data-columns="3"] {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.slimwp-stripe-packages[data-columns="4"] {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* Package Cards */
+.slimwp-package-card {
+    background: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.slimwp-package-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    border-color: #2271b1;
+}
+
+/* Package Header */
+.package-header {
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.package-name {
+    margin: 0 0 12px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1d2327;
+    line-height: 1.3;
+}
+
+.package-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #2271b1;
+}
+
+.package-price .currency {
+    font-size: 18px;
+    font-weight: 500;
+    color: #50575e;
+}
+
+.package-price .amount {
+    color: #2271b1;
+}
+
+/* Package Content */
+.package-content {
+    margin-bottom: 24px;
+}
+
+.package-points {
+    background: #f6f7f7;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.points-amount {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d2327;
+    margin-bottom: 4px;
+}
+
+.points-label {
+    font-size: 14px;
+    color: #50575e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.package-description {
+    margin: 0;
+    font-size: 14px;
+    color: #50575e;
+    line-height: 1.5;
+}
+
+/* Package Footer */
+.package-footer {
+    margin-top: auto;
+}
+
+.slimwp-buy-button,
+.slimwp-login-button {
+    display: inline-block;
+    width: 100%;
+    padding: 12px 24px;
+    background: #2271b1;
+    color: #fff;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.slimwp-buy-button:hover,
+.slimwp-login-button:hover {
+    background: #135e96;
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.slimwp-buy-button:disabled {
+    background: #ccd0d4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.slimwp-login-button {
+    background: #50575e;
+}
+
+.slimwp-login-button:hover {
+    background: #3c434a;
+}
+
+/* Success/Cancel Notices */
+.slimwp-stripe-success-notice,
+.slimwp-stripe-cancel-notice {
+    position: fixed;
+    top: 32px;
+    right: 20px;
+    max-width: 400px;
+    padding: 16px 20px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 9999;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.slimwp-stripe-success-notice {
+    background: #d1e7dd;
+    border: 1px solid #badbcc;
+    color: #0f5132;
+}
+
+.slimwp-stripe-cancel-notice {
+    background: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+}
+
+.slimwp-stripe-success-notice p,
+.slimwp-stripe-cancel-notice p {
+    margin: 0;
+}
+
+.notice-dismiss {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.notice-dismiss:hover {
+    opacity: 1;
+}
+
+.notice-dismiss:before {
+    content: '×';
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.screen-reader-text {
+    position: absolute !important;
+    clip: rect(1px, 1px, 1px, 1px);
+    word-wrap: normal !important;
+    overflow: hidden;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .slimwp-stripe-packages {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+    
+    .slimwp-package-card {
+        padding: 20px;
+    }
+    
+    .package-name {
+        font-size: 18px;
+    }
+    
+    .package-price {
+        font-size: 24px;
+    }
+    
+    .points-amount {
+        font-size: 20px;
+    }
+    
+    .slimwp-stripe-success-notice,
+    .slimwp-stripe-cancel-notice {
+        position: relative;
+        top: auto;
+        right: auto;
+        max-width: none;
+        margin: 20px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .slimwp-package-card {
+        padding: 16px;
+    }
+    
+    .package-price {
+        font-size: 20px;
+    }
+    
+    .slimwp-buy-button,
+    .slimwp-login-button {
+        padding: 10px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Loading Animation */
+.slimwp-buy-button:disabled {
+    position: relative;
+}
+
+.slimwp-buy-button:disabled:after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

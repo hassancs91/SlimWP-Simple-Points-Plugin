@@ -1,0 +1,69 @@
+/* SlimWP Simple Points - Frontend Styles */
+
+.slimwp-points-balance {
+    display: inline-block;
+    font-weight: 600;
+    color: #2271b1;
+}
+
+.slimwp-points-balance-free {
+    display: inline-block;
+    font-weight: 600;
+    color: #135e96;
+}
+
+.slimwp-points-balance-permanent {
+    display: inline-block;
+    font-weight: 600;
+    color: #00a32a;
+}
+
+.slimwp-points-widget {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.slimwp-points-widget h3 {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.slimwp-points-breakdown {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.slimwp-points-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background: #fff;
+    border-radius: 3px;
+    border: 1px solid #e1e1e1;
+}
+
+.slimwp-points-item-label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.slimwp-points-item-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .slimwp-points-breakdown {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

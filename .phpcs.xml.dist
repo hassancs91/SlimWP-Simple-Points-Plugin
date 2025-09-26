@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<ruleset name="SlimWP Simple Points Coding Standards">
+    <description>Coding standards for SlimWP Simple Points plugin</description>
+    
+    <!-- Apply WordPress Coding Standards -->
+    <rule ref="WordPress"/>
+    
+    <!-- Exclude test files from image function checks -->
+    <rule ref="PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage">
+        <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    
+    <!-- Exclude security test files from certain security checks -->
+    <rule ref="WordPress.Security">
+        <exclude-pattern>*/tests/test-xss-security.php</exclude-pattern>
+    </rule>
+    
+    <!-- Set minimum PHP version -->
+    <config name="minimum_wp_version" value="5.0"/>
+    <config name="minimum_php_version" value="7.4"/>
+    
+    <!-- Include only specific directories -->
+    <file>./includes</file>
+    <file>./slimwp-simple-points.php</file>
+    <file>./uninstall.php</file>
+    
+    <!-- Exclude external libraries -->
+    <exclude-pattern>*/stripe-php/*</exclude-pattern>
+    <exclude-pattern>*/plugin-update-checker-master/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    
+    <!-- Allow specific exceptions for admin pages -->
+    <rule ref="WordPress.Security.EscapeOutput">
+        <properties>
+            <property name="customAutoEscapedFunctions" type="array">
+                <element value="number_format"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>
