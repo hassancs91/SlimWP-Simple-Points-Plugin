@@ -87,11 +87,28 @@ class SlimWP_Settings {
                 'email_template' => sanitize_textarea_field($_POST['stripe_email_template'])
             );
             update_option('slimwp_stripe_settings', $stripe_settings);
-            
-            
+
+            // Save PMPro settings
+            $pmpro_enabled = isset($_POST['pmpro']['enabled']);
+
+            // Prevent enabling PMPro integration if dependencies not met
+            if ($pmpro_enabled && (!defined('PMPRO_VERSION') && !function_exists('pmpro_getMembershipLevelForUser'))) {
+                $pmpro_enabled = false;
+                $pmpro_error = true;
+            }
+
+            $pmpro_settings = array(
+                'enabled' => $pmpro_enabled
+            );
+            update_option('slimwp_pmpro_settings', $pmpro_settings);
+
             // Show appropriate success/error messages
-            if (isset($woocommerce_error)) {
+            if (isset($woocommerce_error) && isset($pmpro_error)) {
+                echo '<div class="notice notice-error is-dismissible" style="margin: 20px 20px 0;"><p>❌ Settings saved, but WooCommerce and PMPro integrations could not be enabled. Please install and activate the required plugins first.</p></div>';
+            } elseif (isset($woocommerce_error)) {
                 echo '<div class="notice notice-error is-dismissible" style="margin: 20px 20px 0;"><p>❌ Settings saved, but WooCommerce integration could not be enabled. Please install and activate WooCommerce first.</p></div>';
+            } elseif (isset($pmpro_error)) {
+                echo '<div class="notice notice-error is-dismissible" style="margin: 20px 20px 0;"><p>❌ Settings saved, but PMPro integration could not be enabled. Please install and activate Paid Memberships Pro first.</p></div>';
             } else {
                 echo '<div class="notice notice-success is-dismissible" style="margin: 20px 20px 0;"><p>✅ Settings saved successfully!</p></div>';
             }
@@ -131,6 +148,11 @@ class SlimWP_Settings {
             'live_webhook_secret' => '',
             'currency' => 'USD',
             'email_template' => "Hello {user_name},\n\nThank you for your purchase!\n\nYou have successfully purchased {points} points for {amount} {currency}.\n\nThe points have been added to your permanent balance and are ready to use.\n\nBest regards,\n{site_name}\n{site_url}"
+        ));
+
+        // Get PMPro settings
+        $pmpro_settings = get_option('slimwp_pmpro_settings', array(
+            'enabled' => false
         ));
         ?>
         <style>
@@ -521,7 +543,58 @@ class SlimWP_Settings {
                                 <?php submit_button('Save Settings', 'primary', 'submit', false); ?>
                             </div>
                         </div>
-                        
+
+                        <div class="settings-card">
+                            <h2>🏆 PMPro Membership Points Integration</h2>
+
+                            <div class="settings-row">
+                                <div class="settings-label">
+                                    <h3>Enable PMPro Integration</h3>
+                                    <p>Award automatic points based on membership levels</p>
+                                </div>
+                                <div class="settings-control">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" name="pmpro[enabled]" value="1" <?php checked($pmpro_settings['enabled']); ?>>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+
+                                    <?php if (defined('PMPRO_VERSION') || function_exists('pmpro_getMembershipLevelForUser')): ?>
+                                        <div class="info-box">
+                                            <strong>✅ PMPro Status:</strong> Active and compatible<br>
+                                            <a href="<?php echo admin_url('admin.php?page=slimwp-pmpro-points'); ?>" class="button" style="margin-top: 8px;">Configure Membership Points →</a>
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="warning-box">
+                                            <strong>⚠️ PMPro Status:</strong> Not installed or inactive<br>
+                                            <small>Please install and activate Paid Memberships Pro to use this integration.</small><br>
+                                            <a href="<?php echo admin_url('plugin-install.php?s=paid+memberships+pro&tab=search&type=term'); ?>" target="_blank" style="text-decoration: underline; font-size: 12px;">Install PMPro</a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+
+                            <div class="settings-row">
+                                <div class="settings-label">
+                                    <h3>How It Works</h3>
+                                    <p>Automatic point awards based on membership levels</p>
+                                </div>
+                                <div class="settings-control">
+                                    <div class="info-box">
+                                        <strong>Features:</strong><br>
+                                        • Daily, weekly, monthly, and yearly point awards<br>
+                                        • Different point amounts for each membership level<br>
+                                        • Event-driven system (checks on login and page load)<br>
+                                        • Smart caching for optimal performance<br>
+                                        • Automatic start/stop based on membership status
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="submit-wrap">
+                                <?php submit_button('Save Settings', 'primary', 'submit', false); ?>
+                            </div>
+                        </div>
+
                     </form>
                     
                 </div>

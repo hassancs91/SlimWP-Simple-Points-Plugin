@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Read(//mnt/c/Users/hasan/Local/**)"
+      "Read(//mnt/c/Users/hasan/Local/**)",
+      "Bash(cd:*)"
     ],
     "deny": [],
     "ask": []

@@ -220,6 +220,9 @@ require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-stripe-database.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-stripe-ssl-fix.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-stripe.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-stripe-packages.php';
+require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-pmpro-database.php';
+require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-pmpro.php';
+require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-pmpro-admin.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/functions.php';
 
 // Initialize the plugin
@@ -254,6 +257,7 @@ register_activation_hook(__FILE__, function() {
     
     SlimWP_Database::create_tables();
     SlimWP_Stripe_Database::create_tables();
+    SlimWP_PMPro_Database::create_tables();
 });
 
 // Deactivation hook

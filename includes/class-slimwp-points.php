@@ -20,6 +20,8 @@ class SlimWP_Points {
     private $woocommerce;
     private $stripe;
     private $stripe_packages;
+    private $pmpro;
+    private $pmpro_admin;
     
     public static function get_instance() {
         if (null === self::$instance) {
@@ -48,10 +50,18 @@ class SlimWP_Points {
         
         // Initialize WooCommerce integration
         $this->woocommerce = new SlimWP_WooCommerce($this);
-        
+
         // Initialize Stripe integration
         $this->stripe = new SlimWP_Stripe($this);
-        
+
+        // Initialize PMPro integration
+        $this->pmpro = new SlimWP_PMPro($this);
+
+        // Initialize PMPro admin if in admin area
+        if (is_admin()) {
+            $this->pmpro_admin = new SlimWP_PMPro_Admin($this, $this->pmpro);
+        }
+
         // Initialize everything
         add_action('init', array($this, 'init'));
     }
@@ -59,6 +69,11 @@ class SlimWP_Points {
     public function init() {
         // Ensure tables exist
         SlimWP_Database::create_tables();
+
+        // Ensure PMPro tables exist if PMPro is active
+        if (defined('PMPRO_VERSION') || function_exists('pmpro_getMembershipLevelForUser')) {
+            SlimWP_PMPro_Database::create_tables();
+        }
     }
     
     // Keep all the core balance methods here
