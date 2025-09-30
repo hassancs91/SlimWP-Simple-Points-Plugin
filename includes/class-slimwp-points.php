@@ -16,6 +16,7 @@ class SlimWP_Points {
     private $ajax;
     private $user_profile;
     private $admin;
+    private $dashboard;
     private $settings;
     private $woocommerce;
     private $stripe;
@@ -43,6 +44,7 @@ class SlimWP_Points {
         
         if (is_admin()) {
             $this->admin = new SlimWP_Admin($this);
+            $this->dashboard = new SlimWP_Dashboard($this);
             $this->settings = new SlimWP_Settings($this);
             $this->documentation = new SlimWP_Documentation();
             $this->stripe_packages = new SlimWP_Stripe_Packages($this);

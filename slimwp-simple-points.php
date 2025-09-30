@@ -212,6 +212,7 @@ require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-shortcodes.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-ajax.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-user-profile.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-admin.php';
+require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-dashboard.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-settings.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-documentation.php';
 require_once SLIMWP_PLUGIN_DIR . 'includes/class-slimwp-points.php';

@@ -12,27 +12,21 @@ class SlimWP_Admin {
         $this->points_system = $points_system;
         $this->table_name = $points_system->get_table_name();
         
-        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_menu', array($this, 'add_admin_menu'), 15);
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_assets'));
     }
     
     public function add_admin_menu() {
-        add_menu_page(
-            __('SlimWP Points System', 'SlimWp-Simple-Points'),
-            __('SlimWP Points', 'SlimWp-Simple-Points'),
-            'manage_options',
-            'slimwp-points',
-            array($this, 'admin_page'),
-            'dashicons-awards',
-            30
-        );
-        
+        // Note: The main menu page will be handled by the Dashboard class
+        // We just need to add the transactions submenu here
+
+        // Add transactions as a submenu (not using the main slug)
         add_submenu_page(
             'slimwp-points',
             __('Transactions', 'SlimWp-Simple-Points'),
             __('Transactions', 'SlimWp-Simple-Points'),
             'manage_options',
-            'slimwp-points',
+            'slimwp-transactions',
             array($this, 'admin_page')
         );
         
@@ -47,10 +41,10 @@ class SlimWP_Admin {
     }
     
     public function enqueue_admin_assets($hook) {
-        if (strpos($hook, 'slimwp-points') !== false) {
+        if (strpos($hook, 'slimwp-transactions') !== false || strpos($hook, 'slimwp-user-consumption') !== false) {
             wp_enqueue_style('slimwp-admin', SLIMWP_PLUGIN_URL . 'includes/assets/css/admin.css', array(), SLIMWP_VERSION);
             wp_enqueue_script('slimwp-admin', SLIMWP_PLUGIN_URL . 'includes/assets/js/admin.js', array('jquery'), SLIMWP_VERSION, true);
-            
+
             wp_localize_script('slimwp-admin', 'slimwp_admin', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'nonce' => wp_create_nonce('slimwp_nonce')

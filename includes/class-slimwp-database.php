@@ -32,6 +32,41 @@ class SlimWP_Database {
         // Add columns if they don't exist
         self::add_column_if_not_exists($table_name, 'permanent_balance_after', "ADD COLUMN permanent_balance_after decimal(10,2) DEFAULT 0 AFTER balance_after");
         self::add_column_if_not_exists($table_name, 'balance_type', "ADD COLUMN balance_type varchar(20) DEFAULT 'free' AFTER permanent_balance_after");
+
+        // Create dashboard content table
+        self::create_dashboard_content_table();
+    }
+
+    public static function create_dashboard_content_table() {
+        global $wpdb;
+
+        $table_name = $wpdb->prefix . 'slimwp_dashboard_content';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE IF NOT EXISTS {$table_name} (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            content_type varchar(50) NOT NULL,
+            title varchar(255) NOT NULL,
+            content longtext NOT NULL,
+            excerpt text,
+            priority int(11) DEFAULT 0,
+            status varchar(20) DEFAULT 'active',
+            display_from datetime DEFAULT NULL,
+            display_until datetime DEFAULT NULL,
+            click_count int(11) DEFAULT 0,
+            meta_data longtext,
+            created_by bigint(20) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            KEY content_type (content_type),
+            KEY status (status),
+            KEY priority (priority),
+            KEY display_dates (display_from, display_until)
+        ) $charset_collate;";
+
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
     }
     
     private static function add_column_if_not_exists($table_name, $column_name, $column_definition) {
