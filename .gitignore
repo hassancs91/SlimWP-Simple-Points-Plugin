@@ -97,8 +97,7 @@ secrets.php
 /tests/reports/
 phpunit.xml
 .phpunit.result.cache
-/tests/
-/tests
+
 
 # Temporary Files
 /tmp/
