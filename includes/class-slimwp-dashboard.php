@@ -18,7 +18,6 @@ class SlimWP_Dashboard {
         add_action('admin_menu', array($this, 'add_dashboard_menu'), 10);
         add_action('admin_enqueue_scripts', array($this, 'enqueue_dashboard_assets'));
         add_action('wp_ajax_slimwp_dashboard_refresh', array($this, 'ajax_refresh_dashboard'));
-        add_action('wp_ajax_slimwp_dismiss_content', array($this, 'ajax_dismiss_content'));
     }
 
     public function add_dashboard_menu() {
@@ -69,6 +68,7 @@ class SlimWP_Dashboard {
 
         // Get ads/promotions
         $promotions = $this->get_active_content('promotion');
+        error_log('SlimWP Dashboard: Got ' . count($promotions) . ' promotions to display');
 
         // Get recent activity
         $recent_activity = $this->get_recent_activity();
@@ -158,47 +158,56 @@ class SlimWP_Dashboard {
                         <?php if (!empty($announcements)): ?>
                         <div class="slimwp-dashboard-widget">
                             <div class="widget-header">
-                                <h2><?php _e('Announcements', 'SlimWp-Simple-Points'); ?></h2>
-                                <span class="widget-badge"><?php echo count($announcements); ?></span>
+                                <h2><?php _e('What\'s New', 'SlimWp-Simple-Points'); ?></h2>
+                                <div class="announcement-nav">
+                                    <button class="ann-nav-prev" aria-label="Previous">
+                                        <span class="dashicons dashicons-arrow-left-alt2"></span>
+                                    </button>
+                                    <div class="ann-nav-dots">
+                                        <?php foreach ($announcements as $index => $ann): ?>
+                                            <span class="ann-dot <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <button class="ann-nav-next" aria-label="Next">
+                                        <span class="dashicons dashicons-arrow-right-alt2"></span>
+                                    </button>
+                                </div>
                             </div>
                             <div class="widget-content">
-                                <div class="slimwp-announcements">
-                                    <?php foreach ($announcements as $announcement): ?>
-                                    <div class="announcement-item <?php echo !empty($announcement->is_remote) ? 'remote-content' : ''; ?>"
-                                         data-id="<?php echo esc_attr($announcement->id); ?>"
-                                         data-remote="<?php echo !empty($announcement->is_remote) ? '1' : '0'; ?>">
-                                        <button class="dismiss-btn" data-content-id="<?php echo esc_attr($announcement->id); ?>"
-                                                data-remote="<?php echo !empty($announcement->is_remote) ? '1' : '0'; ?>">
-                                            <span class="dashicons dashicons-dismiss"></span>
-                                        </button>
-                                        <?php if (!empty($announcement->is_remote)): ?>
-                                            <span class="remote-badge"><?php _e('From SlimWP', 'SlimWp-Simple-Points'); ?></span>
-                                        <?php endif; ?>
-                                        <h3><?php echo esc_html($announcement->title); ?></h3>
-                                        <?php if ($announcement->excerpt): ?>
-                                            <p class="announcement-excerpt"><?php echo esc_html($announcement->excerpt); ?></p>
-                                        <?php endif; ?>
-                                        <div class="announcement-content">
-                                            <?php echo wp_kses_post($announcement->content); ?>
+                                <div class="slimwp-announcements-slider">
+                                    <div class="announcements-wrapper">
+                                        <?php foreach ($announcements as $index => $announcement): ?>
+                                        <div class="announcement-slide <?php echo $index === 0 ? 'active' : ''; ?>"
+                                             data-slide="<?php echo $index; ?>">
+                                            <?php if (!empty($announcement->is_remote)): ?>
+                                                <span class="remote-badge"><?php _e('From SlimWP', 'SlimWp-Simple-Points'); ?></span>
+                                            <?php endif; ?>
+                                            <h3><?php echo esc_html($announcement->title); ?></h3>
+                                            <?php if ($announcement->excerpt): ?>
+                                                <p class="announcement-excerpt"><?php echo esc_html($announcement->excerpt); ?></p>
+                                            <?php endif; ?>
+                                            <div class="announcement-content">
+                                                <?php echo wp_kses_post($announcement->content); ?>
+                                            </div>
+                                            <div class="announcement-meta">
+                                                <span class="announcement-date">
+                                                    <?php echo esc_html(human_time_diff(strtotime($announcement->created_at), current_time('timestamp'))); ?> ago
+                                                </span>
+                                                <?php
+                                                // Show importance badge for remote announcements
+                                                if (!empty($announcement->is_remote) && !empty($announcement->meta_data)) {
+                                                    $meta = is_string($announcement->meta_data) ? json_decode($announcement->meta_data, true) : $announcement->meta_data;
+                                                    if (!empty($meta['importance'])): ?>
+                                                        <span class="importance-badge importance-<?php echo esc_attr($meta['importance']); ?>">
+                                                            <?php echo esc_html(ucfirst($meta['importance'])); ?>
+                                                        </span>
+                                                    <?php endif;
+                                                }
+                                                ?>
+                                            </div>
                                         </div>
-                                        <div class="announcement-meta">
-                                            <span class="announcement-date">
-                                                <?php echo esc_html(human_time_diff(strtotime($announcement->created_at), current_time('timestamp'))); ?> ago
-                                            </span>
-                                            <?php
-                                            // Show importance badge for remote announcements
-                                            if (!empty($announcement->is_remote) && !empty($announcement->meta_data)) {
-                                                $meta = is_string($announcement->meta_data) ? json_decode($announcement->meta_data, true) : $announcement->meta_data;
-                                                if (!empty($meta['importance'])): ?>
-                                                    <span class="importance-badge importance-<?php echo esc_attr($meta['importance']); ?>">
-                                                        <?php echo esc_html(ucfirst($meta['importance'])); ?>
-                                                    </span>
-                                                <?php endif;
-                                            }
-                                            ?>
-                                        </div>
+                                        <?php endforeach; ?>
                                     </div>
-                                    <?php endforeach; ?>
                                 </div>
                             </div>
                         </div>
@@ -277,6 +286,85 @@ class SlimWP_Dashboard {
                             </div>
                         </div>
 
+                        <!-- Featured & Promotions -->
+                        <?php if (!empty($promotions)): ?>
+                        <div class="slimwp-dashboard-widget">
+                            <div class="widget-header">
+                                <h2><?php _e('Featured & Promotions', 'SlimWp-Simple-Points'); ?></h2>
+                                <div class="promotion-nav">
+                                    <button class="promo-nav-prev" aria-label="Previous">
+                                        <span class="dashicons dashicons-arrow-left-alt2"></span>
+                                    </button>
+                                    <div class="promo-nav-dots">
+                                        <?php
+                                        $dot_index = 0;
+                                        foreach ($promotions as $promo):
+                                            $index = $dot_index++;
+                                        ?>
+                                            <span class="promo-dot <?php echo $index === 0 ? 'active' : ''; ?>" data-slide="<?php echo $index; ?>"></span>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <button class="promo-nav-next" aria-label="Next">
+                                        <span class="dashicons dashicons-arrow-right-alt2"></span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="widget-content">
+                                <div class="slimwp-promotions-slider">
+                                    <div class="promotions-wrapper">
+                                        <?php
+                                        // Debug: Check what we're getting
+                                        error_log('SlimWP Dashboard: Rendering ' . count($promotions) . ' promotions');
+                                        $promo_index = 0;
+                                        foreach ($promotions as $promotion):
+                                            $index = $promo_index++;
+                                        ?>
+                                        <?php
+                                            // Handle meta_data whether it's a string or array
+                                            $meta = is_string($promotion->meta_data) ? json_decode($promotion->meta_data, true) : (array)$promotion->meta_data;
+                                        ?>
+                                        <div class="promotion-slide <?php echo $index === 0 ? 'active' : ''; ?>"
+                                             data-slide="<?php echo $index; ?>"
+                                             data-id="<?php echo esc_attr($promotion->id); ?>">
+                                            <?php if (!empty($promotion->is_remote)): ?>
+                                                <span class="remote-badge"><?php _e('From SlimWP', 'SlimWp-Simple-Points'); ?></span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($meta['badge_text'])): ?>
+                                                <span class="promo-badge" style="<?php echo !empty($meta['badge_color']) ? 'background-color: ' . esc_attr($meta['badge_color']) . ';' : ''; ?>">
+                                                    <?php echo esc_html($meta['badge_text']); ?>
+                                                </span>
+                                            <?php endif; ?>
+                                            <?php if (!empty($meta['image_url'])): ?>
+                                            <div class="promotion-slide-image">
+                                                <img src="<?php echo esc_url($meta['image_url']); ?>" alt="<?php echo esc_attr($promotion->title); ?>">
+                                            </div>
+                                            <?php endif; ?>
+                                            <div class="promotion-slide-content" <?php echo !empty($meta['background_color']) ? 'style="background-color: ' . esc_attr($meta['background_color']) . ';"' : ''; ?>>
+                                                <h3><?php echo esc_html($promotion->title); ?></h3>
+                                                <?php if (!empty($promotion->excerpt)): ?>
+                                                    <p class="promotion-excerpt"><?php echo esc_html($promotion->excerpt); ?></p>
+                                                <?php endif; ?>
+                                                <div class="promotion-text">
+                                                    <?php echo wp_kses_post($promotion->content); ?>
+                                                </div>
+                                                <?php if (!empty($meta['button_text']) && !empty($meta['button_url'])): ?>
+                                                <a href="<?php echo esc_url($meta['button_url']); ?>"
+                                                   class="promotion-button"
+                                                   target="<?php echo esc_attr($meta['button_target'] ?? '_blank'); ?>"
+                                                   data-promotion-id="<?php echo esc_attr($promotion->id); ?>"
+                                                   data-remote="<?php echo !empty($promotion->is_remote) ? '1' : '0'; ?>">
+                                                    <?php echo esc_html($meta['button_text']); ?>
+                                                </a>
+                                                <?php endif; ?>
+                                            </div>
+                                        </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endif; ?>
+
                         <!-- Top Users -->
                         <div class="slimwp-dashboard-widget">
                             <div class="widget-header">
@@ -341,62 +429,6 @@ class SlimWP_Dashboard {
                         </div>
                     </div>
                 </div>
-
-                <!-- Promotions Section (Full Width) -->
-                <?php if (!empty($promotions)): ?>
-                <div class="slimwp-promotions-section">
-                    <div class="slimwp-dashboard-widget">
-                        <div class="widget-header">
-                            <h2><?php _e('Featured & Promotions', 'SlimWp-Simple-Points'); ?></h2>
-                        </div>
-                        <div class="widget-content">
-                            <div class="promotions-grid">
-                                <?php foreach ($promotions as $promotion): ?>
-                                <?php
-                                    // Handle meta_data whether it's a string or array
-                                    $meta = is_string($promotion->meta_data) ? json_decode($promotion->meta_data, true) : (array)$promotion->meta_data;
-                                ?>
-                                <div class="promotion-card <?php echo !empty($promotion->is_remote) ? 'remote-promotion' : ''; ?>"
-                                     data-id="<?php echo esc_attr($promotion->id); ?>"
-                                     data-remote="<?php echo !empty($promotion->is_remote) ? '1' : '0'; ?>">
-                                    <?php if (!empty($promotion->is_remote)): ?>
-                                        <span class="remote-badge promotion-badge"><?php _e('From SlimWP', 'SlimWp-Simple-Points'); ?></span>
-                                    <?php endif; ?>
-                                    <?php if (!empty($meta['badge_text'])): ?>
-                                        <span class="promo-badge" style="<?php echo !empty($meta['badge_color']) ? 'background-color: ' . esc_attr($meta['badge_color']) . ';' : ''; ?>">
-                                            <?php echo esc_html($meta['badge_text']); ?>
-                                        </span>
-                                    <?php endif; ?>
-                                    <?php if (!empty($meta['image_url'])): ?>
-                                    <div class="promotion-image">
-                                        <img src="<?php echo esc_url($meta['image_url']); ?>" alt="<?php echo esc_attr($promotion->title); ?>">
-                                    </div>
-                                    <?php endif; ?>
-                                    <div class="promotion-content" <?php echo !empty($meta['background_color']) ? 'style="background-color: ' . esc_attr($meta['background_color']) . ';"' : ''; ?>>
-                                        <h3><?php echo esc_html($promotion->title); ?></h3>
-                                        <?php if (!empty($promotion->excerpt)): ?>
-                                            <p class="promotion-excerpt"><?php echo esc_html($promotion->excerpt); ?></p>
-                                        <?php endif; ?>
-                                        <div class="promotion-text">
-                                            <?php echo wp_kses_post($promotion->content); ?>
-                                        </div>
-                                        <?php if (!empty($meta['button_text']) && !empty($meta['button_url'])): ?>
-                                        <a href="<?php echo esc_url($meta['button_url']); ?>"
-                                           class="promotion-button"
-                                           target="<?php echo esc_attr($meta['button_target'] ?? '_blank'); ?>"
-                                           data-promotion-id="<?php echo esc_attr($promotion->id); ?>"
-                                           data-remote="<?php echo !empty($promotion->is_remote) ? '1' : '0'; ?>">
-                                            <?php echo esc_html($meta['button_text']); ?>
-                                        </a>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                                <?php endforeach; ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
             </div>
         </div>
         <?php
@@ -476,16 +508,10 @@ class SlimWP_Dashboard {
             $remote_content = $this->get_remote_promotions();
         }
 
-        // Convert remote content to match local format and add source indicator
+        // Convert to objects and add source indicator
         foreach ($remote_content as &$item) {
             $item = (object) $item;
             $item->is_remote = true;
-
-            // Check if user has dismissed this remote content
-            $dismissed = get_user_meta(get_current_user_id(), 'slimwp_dismissed_remote_content', true);
-            if (is_array($dismissed) && in_array($item->id . '_remote', $dismissed)) {
-                continue; // Skip dismissed items
-            }
         }
 
         // Merge and sort by priority
@@ -517,17 +543,23 @@ class SlimWP_Dashboard {
 
         if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
             $body = json_decode(wp_remote_retrieve_body($response), true);
-            if (isset($body['data']['announcements']) && is_array($body['data']['announcements'])) {
-                // Filter for active and current announcements
-                $announcements = array_filter($body['data']['announcements'], function($item) {
-                    if ($item['status'] !== 'active') return false;
+            // Check both possible response structures for compatibility
+            $announcements_data = null;
+            if (isset($body['announcements']) && is_array($body['announcements'])) {
+                $announcements_data = $body['announcements'];
+            } elseif (isset($body['data']['announcements']) && is_array($body['data']['announcements'])) {
+                $announcements_data = $body['data']['announcements'];
+            }
 
-                    $now = current_time('timestamp');
-                    if (!empty($item['display_from']) && strtotime($item['display_from']) > $now) return false;
-                    if (!empty($item['display_until']) && strtotime($item['display_until']) < $now) return false;
-
-                    return true;
+            if ($announcements_data) {
+                // Filter only for active status, ignore date restrictions
+                $announcements = array_filter($announcements_data, function($item) {
+                    // Only check if status is active
+                    return $item['status'] === 'active';
                 });
+
+                // Store backup for offline use
+                update_option('slimwp_remote_announcements_backup', array_values($announcements));
 
                 $cache_time = isset($body['cache_time']) ? intval($body['cache_time']) : 12 * HOUR_IN_SECONDS;
                 set_transient($transient_key, array_values($announcements), $cache_time);
@@ -542,9 +574,12 @@ class SlimWP_Dashboard {
 
     private function get_remote_promotions() {
         $transient_key = 'slimwp_remote_promotions';
-        $cached = get_transient($transient_key);
+
+        // Temporarily bypass cache for debugging
+        $cached = false; // get_transient($transient_key);
 
         if ($cached !== false) {
+            error_log('SlimWP: Using cached promotions: ' . count($cached) . ' items');
             return $cached;
         }
 
@@ -559,24 +594,38 @@ class SlimWP_Dashboard {
 
         if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
             $body = json_decode(wp_remote_retrieve_body($response), true);
-            if (isset($body['data']['promotions']) && is_array($body['data']['promotions'])) {
-                // Filter for active and current promotions
-                $promotions = array_filter($body['data']['promotions'], function($item) {
-                    if ($item['status'] !== 'active') return false;
+            // Check both possible response structures for compatibility
+            $promotions_data = null;
+            if (isset($body['promotions']) && is_array($body['promotions'])) {
+                $promotions_data = $body['promotions'];
+            } elseif (isset($body['data']['promotions']) && is_array($body['data']['promotions'])) {
+                $promotions_data = $body['data']['promotions'];
+            }
 
-                    $now = current_time('timestamp');
-                    if (!empty($item['display_from']) && strtotime($item['display_from']) > $now) return false;
-                    if (!empty($item['display_until']) && strtotime($item['display_until']) < $now) return false;
+            if ($promotions_data) {
+                error_log('SlimWP: Raw promotions from API: ' . count($promotions_data) . ' items');
 
-                    return true;
+                // Filter only for active status, ignore date restrictions
+                $promotions = array_filter($promotions_data, function($item) {
+                    // Only check if status is active
+                    return $item['status'] === 'active';
                 });
 
+                error_log('SlimWP: Active promotions after filter: ' . count($promotions) . ' items');
+
+                // Re-index array to ensure numeric keys starting from 0
+                $promotions = array_values($promotions);
+
+                error_log('SlimWP: Final promotions array: ' . json_encode(array_map(function($p) {
+                    return ['id' => $p['id'], 'title' => $p['title']];
+                }, $promotions)));
+
                 // Store backup for offline use
-                update_option('slimwp_remote_promotions_backup', array_values($promotions));
+                update_option('slimwp_remote_promotions_backup', $promotions);
 
                 $cache_time = isset($body['cache_time']) ? intval($body['cache_time']) : 12 * HOUR_IN_SECONDS;
-                set_transient($transient_key, array_values($promotions), $cache_time);
-                return array_values($promotions);
+                set_transient($transient_key, $promotions, $cache_time);
+                return $promotions;
             }
         }
 
@@ -670,30 +719,4 @@ class SlimWP_Dashboard {
         ));
     }
 
-    public function ajax_dismiss_content() {
-        check_ajax_referer('slimwp_dashboard_nonce', 'nonce');
-
-        $content_id = intval($_POST['content_id']);
-        $is_remote = !empty($_POST['is_remote']);
-
-        if ($is_remote) {
-            // Store dismissed remote content separately
-            $dismissed = get_user_meta(get_current_user_id(), 'slimwp_dismissed_remote_content', true);
-            if (!is_array($dismissed)) {
-                $dismissed = array();
-            }
-            $dismissed[] = $content_id . '_remote';
-            update_user_meta(get_current_user_id(), 'slimwp_dismissed_remote_content', array_unique($dismissed));
-        } else {
-            // Store dismissed local content
-            $dismissed = get_user_meta(get_current_user_id(), 'slimwp_dismissed_content', true);
-            if (!is_array($dismissed)) {
-                $dismissed = array();
-            }
-            $dismissed[] = $content_id;
-            update_user_meta(get_current_user_id(), 'slimwp_dismissed_content', array_unique($dismissed));
-        }
-
-        wp_send_json_success();
-    }
 }

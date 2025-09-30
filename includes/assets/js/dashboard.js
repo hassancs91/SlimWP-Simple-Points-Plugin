@@ -145,58 +145,212 @@ jQuery(document).ready(function($) {
         });
     }
 
-    // Dismiss content (announcements/promotions)
-    $('.dismiss-btn').on('click', function(e) {
-        e.preventDefault();
-        const button = $(this);
-        const contentId = button.data('content-id');
-        const isRemote = button.data('remote') === '1' || button.data('remote') === 1;
-        const item = button.closest('.announcement-item');
+    // Announcement Slider Functionality
+    let currentSlide = 0;
+    const slides = $('.announcement-slide');
+    const totalSlides = slides.length;
+    const dots = $('.ann-dot');
+    const prevBtn = $('.ann-nav-prev');
+    const nextBtn = $('.ann-nav-next');
+    let autoSlideInterval = null;
 
-        $.ajax({
-            url: slimwp_dashboard.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'slimwp_dismiss_content',
-                content_id: contentId,
-                is_remote: isRemote ? 1 : 0,
-                nonce: slimwp_dashboard.nonce
-            },
-            success: function(response) {
-                if (response.success) {
-                    item.slideUp(300, function() {
-                        item.remove();
+    // Function to show specific slide
+    function showSlide(index) {
+        if (index < 0) index = totalSlides - 1;
+        if (index >= totalSlides) index = 0;
 
-                        // Update count badge
-                        const badge = $('.widget-badge');
-                        const count = parseInt(badge.text()) - 1;
-                        badge.text(count);
+        currentSlide = index;
 
-                        if (count === 0) {
-                            badge.hide();
-                        }
+        // Update slides
+        slides.removeClass('active');
+        slides.eq(index).addClass('active');
 
-                        // If no announcements left, hide the section
-                        if ($('.announcement-item').length === 0) {
-                            $('.slimwp-dashboard-widget:has(.slimwp-announcements)').fadeOut();
-                        }
-                    });
-                }
-            }
-        });
+        // Update dots
+        dots.removeClass('active');
+        dots.eq(index).addClass('active');
+
+        // Update button states
+        prevBtn.prop('disabled', false);
+        nextBtn.prop('disabled', false);
+
+        if (totalSlides <= 1) {
+            prevBtn.prop('disabled', true);
+            nextBtn.prop('disabled', true);
+        }
+    }
+
+    // Navigate to previous slide
+    prevBtn.on('click', function() {
+        if (!$(this).prop('disabled')) {
+            showSlide(currentSlide - 1);
+            resetAutoSlide();
+        }
     });
 
-    // Promotion card click tracking
-    $('.promotion-card').on('click', 'a.promotion-button', function() {
-        const card = $(this).closest('.promotion-card');
-        const promotionId = card.data('id');
+    // Navigate to next slide
+    nextBtn.on('click', function() {
+        if (!$(this).prop('disabled')) {
+            showSlide(currentSlide + 1);
+            resetAutoSlide();
+        }
+    });
 
-        // Track click (you could send this to server)
+    // Click on dots to navigate
+    dots.on('click', function() {
+        const slideIndex = parseInt($(this).data('slide'));
+        showSlide(slideIndex);
+        resetAutoSlide();
+    });
+
+    // Auto-slide functionality
+    function startAutoSlide() {
+        if (totalSlides > 1) {
+            autoSlideInterval = setInterval(function() {
+                showSlide(currentSlide + 1);
+            }, 5000); // Change slide every 5 seconds
+        }
+    }
+
+    // Reset auto-slide when user interacts
+    function resetAutoSlide() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+            startAutoSlide();
+        }
+    }
+
+    // Keyboard navigation for slider
+    $(document).on('keydown', function(e) {
+        if ($('.slimwp-announcements-slider').is(':visible')) {
+            if (e.keyCode === 37) { // Left arrow
+                showSlide(currentSlide - 1);
+                resetAutoSlide();
+            } else if (e.keyCode === 39) { // Right arrow
+                showSlide(currentSlide + 1);
+                resetAutoSlide();
+            }
+        }
+    });
+
+    // Initialize slider
+    if (totalSlides > 0) {
+        showSlide(0);
+        startAutoSlide();
+    }
+
+    // Pause on hover
+    $('.slimwp-announcements-slider').on('mouseenter', function() {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+        }
+    }).on('mouseleave', function() {
+        startAutoSlide();
+    });
+
+    // Promotion Slider Functionality
+    let currentPromoSlide = 0;
+    const promoSlides = $('.promotion-slide');
+    const totalPromoSlides = promoSlides.length;
+    const promoDots = $('.promo-dot');
+    const promoPrevBtn = $('.promo-nav-prev');
+    const promoNextBtn = $('.promo-nav-next');
+    let promoAutoSlideInterval = null;
+
+    // Function to show specific promotion slide
+    function showPromoSlide(index) {
+        if (index < 0) index = totalPromoSlides - 1;
+        if (index >= totalPromoSlides) index = 0;
+
+        currentPromoSlide = index;
+
+        // Update slides
+        promoSlides.removeClass('active');
+        promoSlides.eq(index).addClass('active');
+
+        // Update dots
+        promoDots.removeClass('active');
+        promoDots.eq(index).addClass('active');
+
+        // Update button states
+        promoPrevBtn.prop('disabled', false);
+        promoNextBtn.prop('disabled', false);
+
+        if (totalPromoSlides <= 1) {
+            promoPrevBtn.prop('disabled', true);
+            promoNextBtn.prop('disabled', true);
+        }
+    }
+
+    // Navigate to previous promotion
+    promoPrevBtn.on('click', function() {
+        if (!$(this).prop('disabled')) {
+            showPromoSlide(currentPromoSlide - 1);
+            resetPromoAutoSlide();
+        }
+    });
+
+    // Navigate to next promotion
+    promoNextBtn.on('click', function() {
+        if (!$(this).prop('disabled')) {
+            showPromoSlide(currentPromoSlide + 1);
+            resetPromoAutoSlide();
+        }
+    });
+
+    // Click on dots to navigate promotions
+    promoDots.on('click', function() {
+        const slideIndex = parseInt($(this).data('slide'));
+        showPromoSlide(slideIndex);
+        resetPromoAutoSlide();
+    });
+
+    // Auto-slide functionality for promotions
+    function startPromoAutoSlide() {
+        if (totalPromoSlides > 1) {
+            promoAutoSlideInterval = setInterval(function() {
+                showPromoSlide(currentPromoSlide + 1);
+            }, 7000); // Change slide every 7 seconds (different from announcements)
+        }
+    }
+
+    // Reset auto-slide when user interacts
+    function resetPromoAutoSlide() {
+        if (promoAutoSlideInterval) {
+            clearInterval(promoAutoSlideInterval);
+            startPromoAutoSlide();
+        }
+    }
+
+    // Initialize promotion slider
+    if (totalPromoSlides > 0) {
+        showPromoSlide(0);
+        startPromoAutoSlide();
+    }
+
+    // Pause promotion slider on hover
+    $('.slimwp-promotions-slider').on('mouseenter', function() {
+        if (promoAutoSlideInterval) {
+            clearInterval(promoAutoSlideInterval);
+        }
+    }).on('mouseleave', function() {
+        startPromoAutoSlide();
+    });
+
+    // Promotion button click tracking
+    $('.promotion-slide').on('click', 'a.promotion-button', function(e) {
+        const slide = $(this).closest('.promotion-slide');
+        const promotionId = slide.data('id');
+        const isRemote = $(this).data('remote') === '1' || $(this).data('remote') === 1;
+
+        // Track click
         $.post(slimwp_dashboard.ajax_url, {
             action: 'slimwp_track_promotion_click',
             promotion_id: promotionId,
+            is_remote: isRemote ? 1 : 0,
             nonce: slimwp_dashboard.nonce
         });
+
+        // Don't prevent default - let the link work normally
     });
 
     // Show notification

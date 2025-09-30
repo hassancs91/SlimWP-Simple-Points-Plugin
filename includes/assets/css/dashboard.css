@@ -179,38 +179,107 @@
     padding: 20px;
 }
 
-/* Announcements */
-.slimwp-announcements {
+/* Announcements Slider */
+.announcement-nav {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    align-items: center;
+    gap: 10px;
 }
 
-.announcement-item {
-    padding: 15px;
+.ann-nav-prev,
+.ann-nav-next {
+    background: none;
+    border: none;
+    color: #8c8f94;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.ann-nav-prev:hover,
+.ann-nav-next:hover {
+    color: #2271b1;
+}
+
+.ann-nav-prev:disabled,
+.ann-nav-next:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.ann-nav-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.ann-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dcdcde;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.ann-dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: #2271b1;
+}
+
+.ann-dot:hover:not(.active) {
+    background: #8c8f94;
+}
+
+.slimwp-announcements-slider {
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+}
+
+.announcements-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.announcement-slide {
+    display: none;
+    padding: 20px;
     background: #f6f7f7;
     border-radius: 6px;
     border-left: 4px solid #2271b1;
-    position: relative;
+    animation: fadeIn 0.5s;
 }
 
-.announcement-item.remote-content {
-    background: linear-gradient(135deg, #f6f7f7 0%, #f0f6ff 100%);
-    border-left-color: #4a90e2;
+.announcement-slide.active {
+    display: block;
 }
 
-.announcement-item h3 {
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.announcement-slide h3 {
     margin: 0 0 10px;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     color: #1d2327;
 }
 
 .announcement-excerpt {
-    font-size: 13px;
+    font-size: 14px;
     color: #50575e;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     line-height: 1.6;
+    font-style: italic;
 }
 
 .announcement-content {
@@ -223,26 +292,25 @@
     margin: 10px 0;
 }
 
+.announcement-content ul,
+.announcement-content ol {
+    margin: 10px 0;
+    padding-left: 20px;
+}
+
+.announcement-content li {
+    margin: 5px 0;
+}
+
 .announcement-meta {
-    margin-top: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e1e1e1;
     font-size: 12px;
     color: #8c8f94;
-}
-
-.dismiss-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: none;
-    border: none;
-    color: #8c8f94;
-    cursor: pointer;
-    padding: 4px;
-    transition: color 0.2s;
-}
-
-.dismiss-btn:hover {
-    color: #50575e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 /* Activity Feed */
@@ -542,7 +610,186 @@
     100% { transform: scale(1); }
 }
 
-/* Promotions Section */
+/* Promotions Slider */
+.promotion-nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.promo-nav-prev,
+.promo-nav-next {
+    background: none;
+    border: none;
+    color: #8c8f94;
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.promo-nav-prev:hover,
+.promo-nav-next:hover {
+    color: #2271b1;
+}
+
+.promo-nav-prev:disabled,
+.promo-nav-next:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.promo-nav-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.promo-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #dcdcde;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.promo-dot.active {
+    width: 24px;
+    border-radius: 4px;
+    background: #2271b1;
+}
+
+.promo-dot:hover:not(.active) {
+    background: #8c8f94;
+}
+
+.slimwp-promotions-slider {
+    position: relative;
+    overflow: hidden;
+    min-height: 250px;
+}
+
+.promotions-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.promotion-slide {
+    display: none;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    animation: fadeIn 0.5s;
+}
+
+.promotion-slide.active {
+    display: block;
+}
+
+.promotion-slide .promo-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    z-index: 2;
+    color: #fff;
+    animation: pulse 2s infinite;
+}
+
+.promotion-slide .remote-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+}
+
+.promotion-slide-image {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    background: #f0f0f1;
+}
+
+.promotion-slide-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+}
+
+.promotion-slide:hover .promotion-slide-image img {
+    transform: scale(1.05);
+}
+
+.promotion-slide-content {
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #dcdcde;
+    border-top: none;
+}
+
+.promotion-slide-content h3 {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.promotion-slide .promotion-excerpt {
+    font-size: 13px;
+    color: #8c8f94;
+    margin: 8px 0;
+    font-style: italic;
+}
+
+.promotion-slide .promotion-text {
+    font-size: 13px;
+    color: #50575e;
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.promotion-slide .promotion-text ul,
+.promotion-slide .promotion-text ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.promotion-slide .promotion-text li {
+    margin: 4px 0;
+}
+
+.promotion-slide .promotion-text strong {
+    color: #1d2327;
+    font-weight: 600;
+}
+
+.promotion-slide .promotion-button {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #2271b1;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.promotion-slide .promotion-button:hover {
+    background: #135e96;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Legacy Full Width Promotions (keeping for backward compatibility) */
 .slimwp-promotions-section {
     margin-top: 20px;
 }
