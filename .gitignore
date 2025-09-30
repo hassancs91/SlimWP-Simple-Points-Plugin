@@ -1,0 +1,118 @@
+# WordPress Core
+*.log
+wp-config.php
+wp-content/advanced-cache.php
+wp-content/backup-db/
+wp-content/backups/
+wp-content/blogs.dir/
+wp-content/cache/
+wp-content/upgrade/
+wp-content/uploads/
+wp-content/wp-cache-config.php
+wp-content/plugins/hello.php
+
+# Development and Debug Files
+/debug/
+debug.log
+error_log
+*.debug
+*.test.php
+test-*.php
+*-test.php
+
+# Environment and Configuration
+.env
+.env.*
+config.local.php
+*.local
+local-config.php
+
+# Dependencies (if you decide to use package managers later)
+/vendor/
+/node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# Build and Compiled Files
+/build/
+/dist/
+*.min.js
+*.min.css
+*.map
+*.scss.map
+*.css.map
+
+# IDE and Editor Files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.project
+.settings/
+.buildpath
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Desktop.ini
+
+# Backup Files
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+*.cache
+
+# Database Files
+*.sql
+*.sqlite
+*.db
+
+# Sensitive Information
+*secret*
+*private*
+*credentials*
+api-keys.php
+secrets.php
+
+# Documentation Build Files (if using documentation generators)
+/docs/_build/
+/documentation/build/
+
+# Testing
+/tests/coverage/
+/tests/reports/
+phpunit.xml
+.phpunit.result.cache
+
+# Temporary Files
+/tmp/
+/temp/
+*.pid
+
+# Archive Files (usually not needed in repo)
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# Claude Code specific
+.claude/
+
+# Plugin specific ignores
+/languages/*.mo
+*.pot~

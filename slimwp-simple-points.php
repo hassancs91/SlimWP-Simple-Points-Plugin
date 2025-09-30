@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: SlimWP Simple Points
- * Plugin URI: https://github.com/hassancs91/SlimWP-Simple-Points
+ * Plugin URI: https://github.com/hassancs91/SlimWP-Simple-Points-Plugin
  * Description: A lightweight dual-balance points system for WordPress with free and permanent points tracking.
  * Version: 1.0.7
  * Author: Hasan Aboul Hasan
@@ -22,7 +22,7 @@ use YahnisElsts\PluginUpdateChecker\v5p5\PucFactory;
 
 // Setup the update checker for GitHub public repository
 $myUpdateChecker = PucFactory::buildUpdateChecker(
-    'https://github.com/hassancs91/SlimWP-Simple-Points',
+    'https://github.com/hassancs91/SlimWP-Simple-Points-Plugin',
     __FILE__,
     'slimwp-simple-points'
 );
